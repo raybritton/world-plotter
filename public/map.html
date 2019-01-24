@@ -157,6 +157,7 @@
               lastX = undefined;
               save.removeClass('green').addClass('blue');
             }
+            window.history.pushState("", "World Plotter", "/map.html?id=" + mappingId);
             updateUi();
           },
           error: function(xhr, status, error) {
