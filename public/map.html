@@ -156,10 +156,12 @@
           $.ajax({
           url: "/mapping/" + mappingId,
           method: 'post',
-          body: {
-            x: lastX,
-            y: lastY
-          },
+          dataType: 'json',
+          contentType: 'application/json',
+          data: JSON.stringify({
+            x: lastX.toFixed(3),
+            y: lastY.toFixed(3)
+          }),
           success: function(result) {
             alert("Saved");
           },

@@ -86,13 +86,13 @@ app.post("/mapping/:id", (req, res) => {
     var id = parseInt(req.params.id);
 
     if (isNaN(id)) {
-        res.sendStatus(500);
+        res.status(500).send({error: true});
     } else {
         db.run("UPDATE points SET x = ?, y = ? WHERE id = ?", req.body.x, req.body.y, id, (err) => {
             if (err) {
-                res.sendStatus(500);
+                res.status(500).send({error: true});
             } else {
-                res.sendStatus(200);
+                res.status(200).send({});
             }
         })
     }
