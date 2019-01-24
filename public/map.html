@@ -112,7 +112,7 @@
             lat = result.lat;
             lng = result.lng;
             mappingId = result.id;
-            if (result.x !== undefined) {
+            if (result.x !== null) {
               lastX = result.x;
               lastY = result.y;
               tl_addMarker(lastX, lastY);
