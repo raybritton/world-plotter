@@ -30,10 +30,27 @@ app.get("/mapping", (req, res) => {
     db.get("SELECT * FROM points WHERE x IS NULL LIMIT 1", (err, row) => {
         if (err) {
             console.log(err);
-            res.status(500).send(err);
+            res.status(500).send(err || {error: true});
         } else if (row == undefined) {
             res.status(404).send("{}");
         } else {
+            row.id = parseInt(row.id);
+            res.send(row);
+        }
+    });
+});
+
+app.get("/mapping/:id", (req, res) => {
+    var id = parseInt(req.params.id);
+
+    db.get("SELECT * FROM points WHERE id = ?", [id], (err, row) => {
+        if (err) {
+            console.log(err);
+            res.status(500).send(err || {error: true});
+        } else if (row == undefined) {
+            res.status(404).send("{}");
+        } else {
+            row.id = parseInt(row.id);
             res.send(row);
         }
     });
@@ -46,15 +63,16 @@ app.get("/mapping/:id/:direction", (req, res) => {
     db.get("SELECT rowid FROM points WHERE id == ?", [id], (err, row) => {
         if (err || row == undefined) {
             console.log(err);
-            res.status(500).send(err);
+            res.status(500).send(err || {error: true});
         } else {
             db.get("SELECT * FROM points WHERE rowid == ?", [row.rowid + direction], (err, row) => {
                 if (err) {
                     console.log(err);
-                    res.status(500).send(err);
+                    res.status(500).send(err || {error: true});
                 } else if (row == undefined) {
                     res.status(404).send("{}");
                 } else {
+                    row.id = parseInt(row.id);
                     res.send(row);
                 }
             });

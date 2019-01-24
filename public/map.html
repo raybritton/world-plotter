@@ -65,7 +65,7 @@
           <div class="btn blue" id="map">
             <span>Open map</span>
           </div>
-          <div class="btn blue" id="save">
+          <div class="btn blue" id="save" style="margin-right: 32px;" >
             <span>Save</span>
           </div>
       </div>
@@ -79,12 +79,45 @@
       var idNum = $('#id');
       var map = $('#map');
       var save = $('#save');
+      var latlng = $('#latlng');
 
       var lat;
       var lng;
-      var id;
+      var mappingId;
       var lastX;
       var lastY;
+
+      function updateUi() {
+        idNum.text(mappingId);
+        latlng.text("" + lat + ", " + lng)
+      }
+
+      function getMapping(id, direction) {
+        var url = "/mapping"
+        if (id) {
+          url += "/" + id
+          if (direction) {
+            url += "/" + direction
+          }
+        }
+        $.ajax({
+          url: url,
+          method: 'get',
+          success: function(result) {
+            lat = result.lat;
+            lng = result.lng;
+            mappingId = result.id;
+            if (result.x !== undefined) {
+              lastX = result.x;
+              lastY = result.y;
+            }
+            updateUi();
+          },
+          error: function(xhr, status, error) {
+            alert(error);
+          }
+        });
+      }
       
       $(document).ready(function(){
 
@@ -92,9 +125,7 @@
         var url = new URL(url_string);
         var idParam = url.searchParams.get("id");
 
-        // $.ajax{
-          
-        // }
+        getMapping(idParam);
 
         setupCanvas();
         tl_init(canvasContainer);
@@ -102,9 +133,17 @@
         setReadyCallback(function() {
           
         });
+
+        next.on('click', function() {
+          getMapping(mappingId, 'next');
+        });
+
+        prev.on('click', function() {
+          getMapping(mappingId, 'previous');
+        });
         
         map.on('click', function() {
-          var url = `https://www.google.co.uk/maps/@${lat},${lng},5.5z`
+          var url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`
           window.open(url, '_blank');
         });
 

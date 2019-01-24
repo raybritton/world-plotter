@@ -22,6 +22,7 @@ function tl_init(container) {
     var y = event.offsetY;
     x /= tl_scaleState.map.size.width;
     y /= tl_scaleState.map.size.height;
+    if (x < 0 || x > 1 || y < 0 || y > 1) return;
     tl_state.markers.push({
       x: x,
       y: y
@@ -47,7 +48,7 @@ function tl_resize(canvasCtx, width, height) {
   tl_scaleState.date = {};
   tl_scaleState.stats = {};
   tl_scaleState.map.offset = {
-    x: (width - res[0]),
+    x: (width - res[0]) / 2,
     y: (height * MAP_SIZE - res[1]) / 2
   };
   tl_scaleState.map.size = {

@@ -18,6 +18,13 @@
   color: #ecf0f1;
   
   transition: background-color .3s;
+
+  user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    -webkit-touch-callout: none;
+    -o-user-select: none;
+    -moz-user-select: none;
 }
 
 .btn:hover, .btn:focus {
