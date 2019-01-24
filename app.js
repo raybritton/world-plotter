@@ -63,7 +63,13 @@ app.get("/mapping/:id/:direction", (req, res) => {
 });
 
 app.post("/mapping/:id", (req, res) => {
+    var id = parseInt(req.params.id);
 
+    if (isNaN(id)) {
+        res.sendStatus(500);
+    } else {
+        res.send(200);
+    }
 });
 
 app.use(function(err, req, res, next) {
