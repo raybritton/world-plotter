@@ -90,6 +90,11 @@
       function updateUi() {
         idNum.text(mappingId);
         latlng.text("" + lat + ", " + lng)
+        if (lastX != undefined) {
+          coord.text("" + lastX.toFixed(2) + ", " + lastY.toFixed(2));
+        } else {
+          coord.text("");
+        }
       }
 
       function getMapping(id, direction) {
@@ -110,6 +115,9 @@
             if (result.x !== undefined) {
               lastX = result.x;
               lastY = result.y;
+              tl_addMarker(lastX, lastY);
+            } else {
+              lastX = undefined;
             }
             updateUi();
           },
@@ -135,11 +143,30 @@
         });
 
         next.on('click', function() {
+          tl_clearMarkers();
           getMapping(mappingId, 'next');
         });
 
         prev.on('click', function() {
+          tl_clearMarkers();
           getMapping(mappingId, 'previous');
+        });
+
+        save.on('click', function() {
+          $.ajax({
+          url: "/mapping/" + mappingId,
+          method: 'post',
+          body: {
+            x: lastX,
+            y: lastY
+          },
+          success: function(result) {
+            alert("Saved");
+          },
+          error: function(xhr, status, error) {
+            alert(error);
+          }
+        });
         });
         
         map.on('click', function() {

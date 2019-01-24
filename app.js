@@ -4,6 +4,7 @@ const sqlite = require('sqlite3');
 const util = require('util');
 const sprintf = require('sprintf-js').sprintf;
 const express = require('express');
+const bodyParser = require('body-parser');
 const app = express();
 
 global.SERVER_HOST = process.env.HOSTNAME || 'localhost';
@@ -17,6 +18,7 @@ const db = new sqlite.Database(SQLITE_FILE, (err) => {
 })
 
 app.use(express.static('public'));
+app.use(bodyParser.json());
 
 app.get("/alive", (req, res) => {
     res.sendStatus(200);
@@ -86,7 +88,13 @@ app.post("/mapping/:id", (req, res) => {
     if (isNaN(id)) {
         res.sendStatus(500);
     } else {
-        res.send(200);
+        db.run("UPDATE points SET x = ?, y = ? WHERE id = ?", req.body.x, req.body.y, id, (err) => {
+            if (err) {
+                res.sendStatus(500);
+            } else {
+                res.sendStatus(200);
+            }
+        })
     }
 });
 

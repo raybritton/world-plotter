@@ -26,10 +26,17 @@ function tl_init(container) {
     tl_state.markers.push({
       x: x,
       y: y
-    })
+    });
     view_updatePosition(x,y);
   });
 
+}
+
+function tl_addMarker(x, y) {
+  tl_state.markers.push({
+    x: x,
+    y: y
+  });
 }
 
 function tl_resize(canvasCtx, width, height) {
@@ -57,7 +64,7 @@ function tl_resize(canvasCtx, width, height) {
   };
 }
 
-function tl_clear_markers() {
+function tl_clearMarkers() {
   tl_state.markers = [];
 }
 
