@@ -27,18 +27,44 @@ app.get("/", (req, res) => {
 });
 
 app.get("/mapping", (req, res) => {
-    db.get("SELECT * FROM points WHERE x == NULL", (err, row) => {
+    db.get("SELECT * FROM points WHERE x IS NULL LIMIT 1", (err, row) => {
         if (err) {
             console.log(err);
             res.status(500).send(err);
+        } else if (row == undefined) {
+            res.status(404).send("{}");
+        } else {
+            res.send(row);
         }
     });
-})
+});
 
 app.get("/mapping/:id/:direction", (req, res) => {
-    var direction = ((req.param.direction === "previous") || "next");
-    var id = req.param.id;
-})
+    var direction = (req.params.direction === "previous") ? -1 : 1;
+    var id = parseInt(req.params.id);
+
+    db.get("SELECT rowid FROM points WHERE id == ?", [id], (err, row) => {
+        if (err || row == undefined) {
+            console.log(err);
+            res.status(500).send(err);
+        } else {
+            db.get("SELECT * FROM points WHERE rowid == ?", [row.rowid + direction], (err, row) => {
+                if (err) {
+                    console.log(err);
+                    res.status(500).send(err);
+                } else if (row == undefined) {
+                    res.status(404).send("{}");
+                } else {
+                    res.send(row);
+                }
+            });
+        }
+    })
+});
+
+app.post("/mapping/:id", (req, res) => {
+
+});
 
 app.use(function(err, req, res, next) {
     if (res.headersSent) {
