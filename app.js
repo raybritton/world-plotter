@@ -82,20 +82,15 @@ app.get("/mapping/:id/:direction", (req, res) => {
     })
 });
 
-app.post("/mapping/:id", (req, res) => {
-    var id = parseInt(req.params.id);
-
-    if (isNaN(id)) {
-        res.status(500).send({error: true});
-    } else {
-        db.run("UPDATE points SET x = ?, y = ? WHERE id = ?", req.body.x, req.body.y, id, (err) => {
+app.post("/mapping", (req, res) => {
+    db.run("UPDATE points SET x = ?, y = ? WHERE lat = ? AND lng = ?", 
+            [req.body.x, req.body.y, req.body.lat, req.body.lng], (err) => {
             if (err) {
                 res.status(500).send({error: true});
             } else {
                 res.status(200).send({});
             }
         })
-    }
 });
 
 app.use(function(err, req, res, next) {

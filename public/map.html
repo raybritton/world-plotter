@@ -206,13 +206,15 @@
 
         save.on('click', function() {
           $.ajax({
-          url: "/mapping/" + mappingId,
+          url: "/mapping",
           method: 'post',
           dataType: 'json',
           contentType: 'application/json',
           data: JSON.stringify({
             x: lastX.toFixed(3),
-            y: lastY.toFixed(3)
+            y: lastY.toFixed(3),
+            lat: lat,
+            lng: lng
           }),
           success: function(result) {
             save.removeClass('blue').addClass('green');
