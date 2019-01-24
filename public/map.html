@@ -48,6 +48,26 @@
           width: 120px;
           float: left;
         }
+        #modal_container {
+          display: none;
+          overflow: hidden;
+          position: fixed;
+          z-index: 1;
+          top: 0px;
+          left: 0px;
+          background: rgba(0,0,0,0.48);
+        }
+        #modal_content {
+          bottom: 0px;
+          left: 0px;
+          background-color: white;
+          width: 400px;
+          padding: 32px;
+          height: 100px;
+          margin: 32px;
+          min-width: 0px;
+          position: absolute;
+        }
     </style>
   </head>
   <body class="fill">
@@ -58,7 +78,7 @@
       <div style="width:100%;height:9%;">
           <div class="card" style="min-width: 384px;">
             <div id="prev" class="btn blue"><span>Previous</span></div>
-            <div style="float: left; width: 80px;font-family: monospace;font-size: 2.2em;padding-top: 14px;"><span id="id"></span></div>
+            <div style="float: left; width: 80px;font-family: monospace;font-size: 2.2em;padding-top: 14px;cursor:pointer;"><span id="id"></span></div>
             <div id="next" class="btn blue"><span>Next</span></div>
           </div>
           <div class="card" style="min-width:40%;">
@@ -75,6 +95,13 @@
           </div>
       </div>
     </div>
+    <div class="fill" id="modal_container">
+      <div class="card" id="modal_content">
+        <input id="id_input" style="float:left;font-family: monospace;font-size: 1.8em;width:120px;" value="5345"/>
+        <div class="btn blue" id="specific_id" style="float:left;top: -12px;"><span>Go</span></div>
+        <span id="modal_close" style="font-size: 1.3em;font-weight: bold;cursor: pointer;float:right;padding: 6px;">X</span>
+      </div>
+    </div>
     <script src="world.js"></script>
     <script>
       var canvasContainer = $('#canvas_container');
@@ -85,6 +112,10 @@
       var map = $('#map');
       var save = $('#save');
       var latlng = $('#latlng');
+      var idInput = $('#id_input');
+      var modalClose = $('#modal_close');
+      var specificId = $('#specific_id');
+      var modalContainer = $('#modal_container');
 
       var lat;
       var lng;
@@ -147,6 +178,20 @@
 
         setReadyCallback(function() {
           
+        });
+
+        specificId.on('click', function() {
+          window.open('/map.html?id=' + idInput.val(), '_self');
+        });
+
+        idNum.on('click', function() {
+          idInput.val(mappingId);
+          modalContainer.css('display', 'block');
+          idInput.select();
+        });
+
+        modalClose.on('click', function() {
+          modalContainer.css('display', 'none');
         });
 
         next.on('click', function() {
