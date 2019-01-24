@@ -227,7 +227,7 @@
         });
         
         map.on('click', function() {
-          var url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`
+          var url = `https://maps.google.com/?q=${lat},${lng}&ll=${lat},${lng}&z=4`
           window.open(url, '_blank');
         });
 
