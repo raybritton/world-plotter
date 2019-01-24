@@ -26,17 +26,22 @@
         .card > p {
           padding: 12px;
         }
-        .btn.blue {
+        .btn {
           margin-top: 20px;
           margin-right: 16px;
           float: right;
           width: 10%;
+        }
+        .btn.blue {
           background-color: cornflowerblue;
+        }
+        .btn.green {
+          background-color: green;
         }
         .btn.blue:hover, .btn.blue:focus  {
           background-color: blue;
         }
-        .card > .btn.blue {
+        .card > .btn {
           margin-left: 16px;
           margin-right: 16px;
           margin-top: 8px;
@@ -116,8 +121,10 @@
               lastX = result.x;
               lastY = result.y;
               tl_addMarker(lastX, lastY);
+              save.removeClass('blue').addClass('green');
             } else {
               lastX = undefined;
+              save.removeClass('green').addClass('blue');
             }
             updateUi();
           },
@@ -163,7 +170,7 @@
             y: lastY.toFixed(3)
           }),
           success: function(result) {
-            alert("Saved");
+            save.removeClass('blue').addClass('green');
           },
           error: function(xhr, status, error) {
             alert(error);
@@ -182,6 +189,7 @@
         lastX = x;
         lastY = y;
         coord.text("" + x.toFixed(2) + ',' + y.toFixed(2));
+        save.removeClass('green').addClass('blue');
       }
 
       $(window).resize(function() {
