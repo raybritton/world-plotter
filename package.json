@@ -1,0 +1,21 @@
+{
+  "name": "world-plotter",
+  "version": "1.0.0",
+  "main": "app.js",
+  "author": "Ray Britton <raybritton@gmail.com>",
+  "license": "Apache 2.0",
+  "private": true,
+  "engines": {
+    "node": "8.11.3"
+  },
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "dotenv": "^6.1.0",
+    "express": "^4.16.4",
+    "sprintf-js": "^1.1.2",
+    "sqlite3": "^4.0.6"
+  }
+}
