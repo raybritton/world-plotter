@@ -10,7 +10,7 @@ const FULL_CIRCLE = (Math.PI / 180) * 360;
 
 function setReadyCallback(callback) {
   mapImage.onload = callback;
-  mapImage.src = 'world.png';
+  mapImage.src = 'images/world.png';
 }
 
 function tl_init(container) {
