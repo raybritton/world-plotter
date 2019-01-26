@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html class="fill">
+  <head>
+    <title>World plotter</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" type="text/css" href="reset.css" />
+    <link rel="stylesheet" type="text/css" href="material.css" />
+    <style>
+      body {
+        font-family: monospace;
+      }
+      .fill {
+        width: 100%;
+        height: 100%;
+      }
+      .card {
+        float: left;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+        background-color: white;
+        margin: 16px;
+      }
+      .card-content {
+        padding: 16px;
+      }
+      .btn {
+        margin-left: 16px;
+        margin-top: 16px;
+        margin-bottom: 16px;
+        min-width: 60px;
+        min-height: 30px;
+        float:right;
+      }
+      label {
+        width: 100px;
+        display:inline-block;
+      }
+      .btn.blue {
+        background-color: cornflowerblue;
+      }
+      .btn.green {
+        background-color: green;
+      }
+      .btn.blue:hover, .btn.blue:focus  {
+        background-color: blue;
+      }
+    </style>
+  </head>
+  <body class="fill">
+    <div class="fill" style="background-color: rgb(240,240,240)">
+      <div class="card" id="stats">
+        <div class="card-content">
+          <h3 style="font-size: 1.4em;margin-bottom: 8px;">Mapping stats</h3>
+          <span>Total: <span id="total">?</span></span><br/>
+          <span>Completed: <span id="completed">?</span></span><br/>
+          <span>Precent: <span id="percent">?</span></span>
+        </div>
+
+        <div style="position:relative;background-color:blue;height:16px;" id="completedProgress"></div>
+      </div>
+      <div class="card"  id="stats">
+        <div class="card-content">
+          <h3 style="font-size: 1.4em;margin-bottom: 8px;">Add new mapping</h3>
+          <label for="mapping_id" >ID</label>
+          <input type="number" id="mapping_id" name="mapping_id"><br/>
+          <label for="mapping_lat" >Latitude</label>
+          <input type="number" id="mapping_lat" name="mapping_lat"><br/>
+          <label for="mapping_lng" >Longitude</label>
+          <input type="number" id="mapping_lng" name="mapping_lng"><br/>
+          <button class="btn blue" id="save">Save</button>
+
+          <div style="margin-top:56px;display:none;" id="log">
+            <h3 style="font-size: 1.4em;">Added</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      var total = $('#total');
+      var completed = $('#completed');
+      var percent = $('#percent');
+      var stats = $('#stats');
+      var completedProgress = $('#completedProgress');
+
+      var save = $('#save');
+      var mappingId = $('#mapping_id')[0];
+      var mappingLat = $('#mapping_lat')[0];
+      var mappingLng = $('#mapping_lng')[0];
+      var log = $('#log');
+
+      $(document).ready(function() {
+        $.ajax({
+          url: "/stats",
+          method: 'get',
+          success: function(result) {
+            total.text(result.total)
+            completed.text(result.completed)
+            percent.text((result.completed / result.total).toFixed(3) + "%")
+            var width = stats.width() * (result.completed / result.total);
+            completedProgress.css('width', width + "px");
+          },
+          error: function(xhr, status, error) {
+            alert(error);
+          }
+        })
+
+        save.on('click', function() {
+          var id = mappingId.value;
+          var lat = mappingLat.value;
+          var lng = mappingLng.value;
+          if (id.length == 0 || lat.length == 0 || lng.length == 0) return;
+          id = parseInt(id);
+          lat = parseFloat(lat);
+          lng = parseFloat(lng);
+          if (isNaN(lat) || isNaN(lat) || isNaN(lng)) return;
+          $.ajax({
+            url: '/mapping',
+            method: 'post',
+            dataType: 'json',
+            contentType: 'application/json',
+            data: JSON.stringify({
+              id: id,
+              lat: lat.toFixed(3),
+              lng: lng.toFixed(3)
+            }),
+            success: function(result) {
+              if (result.alreadySet) {
+                alert('Saved and latlng matched existing mapping');
+              } else {
+                alert('Saved');
+              }
+              mappingId.value = "";
+              mappingLat.value = "";
+              mappingLng.value = "";
+              log.css('display', 'block');
+              log.append("<p>" + id + " @ " + lat + "," + lng + "</p>");
+            },
+            error: function(xhr, status, error) {
+              alert(error);
+            }
+          })
+        });
+      });
+    </script>
+  </body>
+</html>

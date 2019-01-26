@@ -208,7 +208,7 @@
         save.on('click', function() {
           $.ajax({
           url: "/mapping",
-          method: 'post',
+          method: 'put',
           dataType: 'json',
           contentType: 'application/json',
           data: JSON.stringify({

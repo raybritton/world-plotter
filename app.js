@@ -82,15 +82,62 @@ app.get("/mapping/:id/:direction", (req, res) => {
     })
 });
 
-app.post("/mapping", (req, res) => {
+app.put("/mapping", (req, res) => {
     db.run("UPDATE points SET x = ?, y = ? WHERE lat = ? AND lng = ?", 
             [req.body.x, req.body.y, req.body.lat, req.body.lng], (err) => {
             if (err) {
+                console.log(err);
                 res.status(500).send({error: true});
             } else {
                 res.status(200).send({});
             }
         })
+});
+
+app.post("/mapping", (req, res) => {
+    db.get("SELECT x,y FROM points WHERE lat = ? AND lng = ? AND x IS NOT NULL LIMIT 1", [
+        req.body.lat, req.body.lng], (err, row) => {
+            if (err) {
+                console.log(err);
+                res.status(500).send({error: true});
+            }
+            row = (row || {})
+            var x = row.x;
+            var y = row.y;
+            var found = (row.x) ? true : false;
+            db.run("INSERT INTO points (id, lat, lng, x, y) VALUES (?, ?, ?, ?, ?)", [
+                req.body.id, req.body.lat, req.body.lng, x, y], (err) => {
+                    if (err) {
+                        console.log(err);
+                        res.status(500).send({error: true});
+                    } else {
+                        res.status(200).send({alreadySet: found});
+                    }
+                });
+        });
+});
+
+app.get("/stats", (req, res) => {
+    db.get("SELECT COUNT(id) AS count FROM points", (err1, row1) => {
+        if (err1) {
+            console.log(err1);
+            res.status(500).send({error: true});
+        } else {
+            var totalCount = row1.count;
+            db.get("SELECT COUNT(id) as count FROM points WHERE x IS NOT NULL", (err2, row2) => {
+                if (err2) {
+                    console.log(err2);
+                    res.status(500).send({error: true});
+                } else {
+                    var completedCount = row2.count;
+                    res.status(200).send({
+                        total: totalCount,
+                        completed: completedCount
+                    });
+                }
+            });
+        }
+    });
 });
 
 app.use(function(err, req, res, next) {
