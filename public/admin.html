@@ -145,7 +145,7 @@
           url: "/stats",
           method: 'get',
           success: function(result) {
-            percent.text((result.completed / result.total).toFixed(3) + "%")
+            percent.text(((result.completed / result.total)*100).toFixed(1) + "%")
             var width = stats.width() * (result.completed / result.total);
             completedProgress.css('width', width + "px");
 
