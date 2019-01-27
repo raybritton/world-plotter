@@ -95,6 +95,10 @@ app.put("/mapping", (req, res) => {
 });
 
 app.post("/mapping", (req, res) => {
+    if (req.body.lat === undefined) {
+        res.status(500).send({error: true});
+        return;
+    }
     db.get("SELECT x,y FROM points WHERE lat = ? AND lng = ? AND x IS NOT NULL LIMIT 1", [
         req.body.lat, req.body.lng], (err, row) => {
             if (err) {
@@ -105,8 +109,8 @@ app.post("/mapping", (req, res) => {
             var x = row.x;
             var y = row.y;
             var found = (row.x) ? true : false;
-            db.run("INSERT INTO points (id, lat, lng, x, y) VALUES (?, ?, ?, ?, ?)", [
-                req.body.id, req.body.lat, req.body.lng, x, y], (err) => {
+            db.run("INSERT INTO points (id, lat, lng, x, y, date, count, category) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", [
+                req.body.id, req.body.lat, req.body.lng, x, y, req.body.date, req.body.count, req.body.category], (err) => {
                     if (err) {
                         console.log(err);
                         res.status(500).send({error: true});
@@ -118,24 +122,25 @@ app.post("/mapping", (req, res) => {
 });
 
 app.get("/stats", (req, res) => {
-    db.get("SELECT COUNT(id) AS count FROM points", (err1, row1) => {
-        if (err1) {
-            console.log(err1);
+    var sql = "SELECT COUNT(id) AS total, SUM(x is NOT NULL) as completed, SUM(category == 'Drowning') as drowned, SUM(category == 'Fall') as fall, SUM(category == 'Murdered') as murdered, SUM(category == 'Exposure') as exposure, SUM(category == 'Vehicle Accident') as accident, SUM(category == 'Unknown') as unknown, SUM(category == 'Multiple') as multiple, SUM(category == 'Sickness') as sickness, SUM(category == 'Rape') as rape, SUM(category == 'Asphyxiation') as asphyxiation, SUM(category == 'War') as war, SUM(category == 'Other') as other, SUM(category == 'Burned') as burned, SUM(count) as peopleTotal FROM points"
+
+    db.get(sql, (err, row) => {
+        if (err) {
+            console.log(err);
             res.status(500).send({error: true});
         } else {
-            var totalCount = row1.count;
-            db.get("SELECT COUNT(id) as count FROM points WHERE x IS NOT NULL", (err2, row2) => {
-                if (err2) {
-                    console.log(err2);
-                    res.status(500).send({error: true});
-                } else {
-                    var completedCount = row2.count;
-                    res.status(200).send({
-                        total: totalCount,
-                        completed: completedCount
-                    });
-                }
-            });
+            res.status(200).send(row);
+        }
+    });
+});
+
+app.get("/json", (req, res) => {
+    db.all("SELECT * FROM points WHERE x IS NOT NULL", (err, rows) => {
+        if (err) {
+            console.log(err);
+            res.status(500).send({error: true});
+        } else {
+            res.status(200).send(rows);
         }
     });
 });

@@ -32,8 +32,9 @@
         float:right;
       }
       label {
-        width: 100px;
+        width: 160px;
         display:inline-block;
+        margin-top: 8px;
       }
       .btn.blue {
         background-color: cornflowerblue;
@@ -53,12 +54,30 @@
           <h3 style="font-size: 1.4em;margin-bottom: 8px;">Mapping stats</h3>
           <span>Total: <span id="total">?</span></span><br/>
           <span>Completed: <span id="completed">?</span></span><br/>
-          <span>Precent: <span id="percent">?</span></span>
+          <span>Precent: <span id="percent">?</span></span><br/>
+          <br/>
+          <h3 style="font-size: 1.4em;margin-bottom: 8px;">People stats</h3>
+          <span>Total dead/missing: <span id="peopleTotal">?????</span></span><br/>
+          <br/>
+          <h3 style="font-size: 1.4em;margin-bottom: 8px;">Causes stats</h3>
+          <span>Drowned: <span id="drowned">?</span></span><br/>
+          <span>Fell: <span id="fall">?</span></span><br/>
+          <span>Murdered: <span id="murdered">?</span></span><br/>
+          <span>Exposure: <span id="exposure">?</span></span><br/>
+          <span>Burned: <span id="burned">?</span></span><br/>
+          <span>Vehicle Accident: <span id="accident">?</span></span><br/>
+          <span>Sickess: <span id="sickness">?</span></span><br/>
+          <span>Raped: <span id="rape">?</span></span><br/>
+          <span>War: <span id="war">?</span></span><br/>
+          <span>Multiple: <span id="multiple">?</span></span><br/>
+          <span>Asphyxiated: <span id="asphyxiation">?</span></span><br/>
+          <span>Other: <span id="other">?</span></span><br/>
+          <span>Unknown: <span id="unknown">?</span></span><br/>
         </div>
 
         <div style="position:relative;background-color:blue;height:16px;" id="completedProgress"></div>
       </div>
-      <div class="card"  id="stats">
+      <div class="card">
         <div class="card-content">
           <h3 style="font-size: 1.4em;margin-bottom: 8px;">Add new mapping</h3>
           <label for="mapping_id" >ID</label>
@@ -67,17 +86,43 @@
           <input type="number" id="mapping_lat" name="mapping_lat"><br/>
           <label for="mapping_lng" >Longitude</label>
           <input type="number" id="mapping_lng" name="mapping_lng"><br/>
-          <button class="btn blue" id="save">Save</button>
+          <label for="mapping_count" >Count</label>
+          <input type="number" id="mapping_count" name="mapping_count"><br/>
+          <label for="mapping_date" >Date (yyyy-mm-dd)</label>
+          <input type="text" id="mapping_date" name="mapping_date"><br/>
+          <label for="mapping_category">Category</label>
+          <select id="mapping_category" name="mapping_category">
+            <option value="Drowning">Drowning</option>
+            <option value="Unknown">Unknown</option>
+            <option value="Murdered">Murdered</option>
+            <option value="Exposure">Exposure</option>
+            <option value="Other">Other</option>
+            <option value="Multiple">Multiple</option>
+            <option value="Sickess">Sickness</option>
+            <option value="Fall">Fall</option>
+            <option value="War">War</option>
+            <option value="Burned">Burned</option>
+            <option value="Rape">Rape</option>
+            <option value="Asphyxiation">Asphyxiation</option>
+            <option value="Vehicle Accident">Vehicle Accident</option>
+          </select>
+          <button class="btn blue" id="save" style="margin-top:30px;">Save</button>
 
           <div style="margin-top:56px;display:none;" id="log">
             <h3 style="font-size: 1.4em;">Added</h3>
           </div>
         </div>
       </div>
-    </div>
+      <div class="card">
+        <div class="card-content">
+          <h3 style="font-size: 1.4em;margin-bottom: 8px;">JSON</h3>
+          <div>
+            <span style="display:inline-block;padding-top: 24px;">Completed mappings</span>
+            <a href="/json"><button class="btn blue" style="margin-left:16px;margin-bottom:16px;">Download</button></a>
+          </div>
+        </div>
+      </div>
     <script>
-      var total = $('#total');
-      var completed = $('#completed');
       var percent = $('#percent');
       var stats = $('#stats');
       var completedProgress = $('#completedProgress');
@@ -86,33 +131,46 @@
       var mappingId = $('#mapping_id')[0];
       var mappingLat = $('#mapping_lat')[0];
       var mappingLng = $('#mapping_lng')[0];
+      var mappingCat= $('#mapping_category')[0];
+      var mappingCount= $('#mapping_count')[0];
+      var mappingDate= $('#mapping_date')[0];
       var log = $('#log');
+
+      var execute = $('#execute');
+      var password = $('#password');
+      var sql = $('#sql');
 
       $(document).ready(function() {
         $.ajax({
           url: "/stats",
           method: 'get',
           success: function(result) {
-            total.text(result.total)
-            completed.text(result.completed)
             percent.text((result.completed / result.total).toFixed(3) + "%")
             var width = stats.width() * (result.completed / result.total);
             completedProgress.css('width', width + "px");
+
+            Object.keys(result).forEach(function (key) {
+              $('#' + key).text(result[key]);
+            });
           },
           error: function(xhr, status, error) {
             alert(error);
           }
-        })
+        });
 
         save.on('click', function() {
           var id = mappingId.value;
           var lat = mappingLat.value;
           var lng = mappingLng.value;
-          if (id.length == 0 || lat.length == 0 || lng.length == 0) return;
+          var category = mappingCat.value;
+          var date = mappingDate.value;
+          var count = mappingCount.value;
+          if (id.length == 0 || lat.length == 0 || lng.length == 0 || category.length == 0 || date.length == 0 || count.length == 0) return;
           id = parseInt(id);
           lat = parseFloat(lat);
           lng = parseFloat(lng);
-          if (isNaN(lat) || isNaN(lat) || isNaN(lng)) return;
+          count = parseFloat(count);
+          if (isNaN(lat) || isNaN(lat) || isNaN(lng) || isNaN(count)) return;
           $.ajax({
             url: '/mapping',
             method: 'post',
@@ -121,7 +179,10 @@
             data: JSON.stringify({
               id: id,
               lat: lat.toFixed(3),
-              lng: lng.toFixed(3)
+              lng: lng.toFixed(3),
+              category: category,
+              date: date,
+              count: count
             }),
             success: function(result) {
               if (result.alreadySet) {
@@ -132,13 +193,38 @@
               mappingId.value = "";
               mappingLat.value = "";
               mappingLng.value = "";
+              mappingCount.value = "";
+              mappingCat.value = "";
+              mappingDate.value = "";
               log.css('display', 'block');
               log.append("<p>" + id + " @ " + lat + "," + lng + "</p>");
             },
             error: function(xhr, status, error) {
               alert(error);
             }
-          })
+          });
+        });
+
+        execute.on('click', function() {
+          var pwd = password.val();
+          var statement = sql.val();
+          $.ajax({
+            url: '/sql',
+            method: 'post',
+            dataType: 'json',
+            contentType: 'application/json',
+            data: JSON.stringify({
+              sql: statement,
+              password: pwd
+            }),
+            success: function(result) {
+              alert('Check the console');
+              console.log(result);
+            },
+            error: function(xhr, status, error) {
+              alert(error);
+            }
+          });
         });
       });
     </script>
