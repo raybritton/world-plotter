@@ -83,8 +83,8 @@ app.get("/mapping/:id/:direction", (req, res) => {
 });
 
 app.put("/mapping", (req, res) => {
-    db.run("UPDATE points SET x = ?, y = ? WHERE lat = ? AND lng = ?", 
-            [req.body.x, req.body.y, req.body.lat, req.body.lng], (err) => {
+    db.run("UPDATE points SET x = ?, y = ? WHERE lat > ? AND lng > ? AND lat < ? AND lng < ?", 
+            [req.body.x, req.body.y, req.body.lat - 0.05, req.body.lng - 0.05,req.body.lat + 0.05, req.body.lng + 0.05], (err) => {
             if (err) {
                 console.log(err);
                 res.status(500).send({error: true});
